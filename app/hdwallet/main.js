@@ -30,7 +30,6 @@ function generateMnemonic() {
 
 function generateMasterKeys(mnemonic) {
     const recoveredSeed = bip39.mnemonicToEntropy(mnemonic);
-    console.log('Recovered Seed:', recoveredSeed);
 
 
     const key = crypto.createHmac('sha512', 'HDWALLET_SEED').update(recoveredSeed).digest();
@@ -39,12 +38,10 @@ function generateMasterKeys(mnemonic) {
     const chainCode = key.slice(32).toString('hex')
 
 
-    console.log('private key', privateKey);
 
 
     const publicKey = getPublicKeyFromPrivate(privateKey)
 
-    console.log('Public key', publicKey);
     return { publicKey, privateKey, chainCode }
 }
 
@@ -79,44 +76,18 @@ function generateKeysForDepth(arrayOfTreeNodeIndex, parentPublicKey, parentPriva
 
 function generateAddressFromPublicKey(publicKey, coin_id) {
 
-    // try {
-    //     const address_length = standard_address_lengths[coin_id]
-    // } catch (error) {
-    //     console.log("coin not supported yet!");
-    // }
-
-    // const address = keccak256(Buffer.from(publicKey, 'hex'))
-    // console.log(Buffer.from(publicKey, 'hex').length);
+    if (coin_id == 60) {
+        return keccak256(Buffer.from(publicKey, 'hex')).slice(-20).toString('hex');
+    }
 
     const compressedPublicKey = eth.publicKey.compress(publicKey)
-    if (coin_id == 60){
-        return keccak256(compressedPublicKey).slice(-20).toString('hex');
-    }
-    
 
     const address = bitcoin.payments.p2pkh({ pubkey: Buffer.from(compressedPublicKey, 'hex') });
-    console.log("Address : ", address.address);
 
     return address.address
 
 }
 
-
-function validateKeyPair(publicKey, privateKey) { // Convert hex strings to Buffer
-    const publicKeyBuffer = Buffer.from(publicKey, 'hex');
-    const privateKeyBuffer = Buffer.from(privateKey, 'hex');
-
-    // Validate that the public key is derived from the private key
-    const derivedPublicKey = secp256k1.publicKeyCreate(privateKeyBuffer, false); // Exclude the prefix byte
-    console.log(publicKey);
-    if (!publicKeyBuffer.equals(derivedPublicKey)) {
-        return false; // Public key does not match the one derived from the private key
-    }
-
-    // Additional checks could be added if needed
-
-    return true; // The public-private key pair is valid
-}
 
 function hmacSha512(key, data) {
     const hmac = crypto.createHmac('sha512', key);
