@@ -2,8 +2,11 @@
 	"dependencies": {
 		"bip32": "^4.0.0",
 		"bip39": "^3.1.0",
+		"bitcoinjs-lib": "^6.1.5",
 		"crypto": "^1.0.1",
 		"elliptic": "^6.5.4",
+		"eth-crypto": "^2.6.0",
+		"keccak256": "^1.0.6",
 		"secp256k1": "^5.0.0"
 	}
 }

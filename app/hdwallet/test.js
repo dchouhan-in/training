@@ -1,29 +1,45 @@
-const crypto = require('crypto');
-const bip39 = require('bip39');
+const {
+  generateChildKeys, generateMasterKeys, generateMnemonic, parseWalletAddress, generateKeysForDepth, generateAddressFromPublicKey
+} = require("./main.js")
 
-// Function to generate a random mnemonic
-function generateMnemonic(bits) {
-  const entropy = crypto.randomBytes(bits / 8);
-  const mnemonic = bip39.entropyToMnemonic(entropy.toString('hex'));
-  return mnemonic;
-}
 
-// Function to calculate checksum
-function calculateChecksum(entropy) {
-  const hash = crypto.createHash('sha256').update(Buffer.from(entropy, 'hex')).digest('hex');
-  const checksumLength = entropy.length / 32; // 8 bits for a 256-bit seed
-  return hash.slice(0, checksumLength);
-}
 
-// Generate a random 24-word mnemonic (256-bit)
-const mnemonic = generateMnemonic(256);
+// const mnemonic = generateMnemonic()
+const mnemonic = "picture blush december sample grant across shy valve resist soul cup concert"
 
-// Calculate checksum
-const entropy = bip39.mnemonicToEntropy(mnemonic);
-const checksum = calculateChecksum(entropy);
+const { publicKey, privateKey, chainCode } = generateMasterKeys(mnemonic)
 
-// Append checksum to mnemonic
-const mnemonicWithChecksum = `${mnemonic}${bip39.entropyToMnemonic(checksum)}`;
 
-console.log('Original Mnemonic:', mnemonic);
-console.log('Mnemonic with Checksum:', mnemonicWithChecksum);
+const wallet_address = "m/44'/0'/0'/0'/0'"
+
+const keys = generateKeysForDepth(parseWalletAddress(wallet_address), publicKey, privateKey, chainCode)
+
+const address = generateAddressFromPublicKey(keys.publicKey, 0)
+console.log(address);
+
+
+const wallet_address_eth_sender = "m/44'/60'/0'/0'/0'"
+
+const keys_sender = generateKeysForDepth(parseWalletAddress(wallet_address_eth_sender), publicKey, privateKey, chainCode)
+
+const address_sender = generateAddressFromPublicKey(keys_sender.publicKey, 60)
+
+// received .5 eth for the address
+// https://sepolia.etherscan.io/tx/0xf6c80174876f514d9e6e85d004adcb3d3faa665163860bf87c6580796d2fdfea
+
+console.log(address_sender);
+
+
+
+const wallet_address_eth_receiver = "m/44'/60'/0'/0'/1'"
+
+const keys_receiver = generateKeysForDepth(parseWalletAddress(wallet_address_eth_receiver), publicKey, privateKey, chainCode)
+
+const address_receiver = generateAddressFromPublicKey(keys_receiver.publicKey, 60)
+
+// received .5 eth for the address
+// https://sepolia.etherscan.io/tx/0xf6c80174876f514d9e6e85d004adcb3d3faa665163860bf87c6580796d2fdfea
+
+console.log(address_receiver);
+
+
